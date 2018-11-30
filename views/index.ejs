@@ -21,10 +21,10 @@
 
   </form>
 
-<h2><%= title %></h2> 
+<h2><%= title %></h2>
   <ul>
   <% users.forEach(function(user){ %>
-<li><%= user.first_name %> <%= user.last_name %></li>
+<li><%= user.first_name %> <%= user.last_name %> - <a class="deleteUser" href="#" data-id="<%= user._id %>">Delete</a></li>
 <% }) %>
   </ul>
 <%include partials/footer %>

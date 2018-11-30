@@ -2,18 +2,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const expressValidator = require("express-validator");
+const mongojs = require("mongojs");
+var db = mongojs('customerapp', ['users'])
+const ObjectId = mongojs.ObjectId;
 
 const app = express();
 
 
 
-/*
-const logger = function(req, res, next){
-  console.log('logging...');
-  next();
-}
 
-app.use*/
 
 // view engine
 app.set('view engine', 'ejs');
@@ -51,36 +48,19 @@ app.use(expressValidator({
   }
 }));
 
-const users = [
-  {
-    id: 1,
-    first_name: 'John',
-    last_name: 'Smith',
-    email: 'john@gmail.com'
-
-  },
-  {
-    id: 2,
-    first_name: 'bob',
-    last_name: 'doe',
-    email: 'john@gmail.com'
-
-  },
-  {
-    id: 3,
-    first_name: 'jill',
-    last_name: 'jackson',
-    email: 'john@gmail.com'
-
-  }
-
-]
 
 app.get('/', function(req, res){
-  res.render("index", {
-    title: 'Customers',
-    users: users
+  // find everything
+db.users.find(function (err, docs) {
+	// docs is an array of all the documents in mycollection
+      // console.log(docs);
+      res.render("index", {
+      title: 'Customers',
+      users: docs
   });
+})
+
+
 });
 
 app.post('/user/add', function(req, res) {
@@ -102,15 +82,23 @@ app.post('/user/add', function(req, res) {
       last_name: req.body.last_name,
       email: req.body.email
     }
-      console.log('SUCCSESS');
+      db.users.insert(newUser, function(err, result){
+        if(err){
+          console.log(err)
+        }
+        res.redirect('/');
+      });
   }
 
-
-
-  console.log(newUser);
-
 });
-
+app.delete('/users/delete/:id', function(req, res){
+ db.users.remove({_id: ObjectId(req.params.id)}, function(err, result){
+   if(err){
+     conosle.log(err);
+   }
+   res.redirect('/')
+ });
+});
 app.listen(3000, function(){
   console.log("Server started on port 3000...")
 });
